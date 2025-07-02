@@ -1,0 +1,48 @@
+# File paths
+processed_data_path: "Recommender/data/processed"
+model_path: "Recommender/models"
+
+# Weights & Biases Configuration
+wandb:
+  project: "movielens-recommender"
+  entity: ksandke-university-of-colorado-boulder
+  enabled: true
+  tags: ["als", "collaborative-filtering", "movielens"]
+
+# CUDA Configuration
+cuda:
+  enabled: false  # Temporarily disabled while troubleshooting GPU setup
+  device: 0      # GPU device index
+
+# ALS Model Hyperparameters
+als:
+  factors: 50
+  regularization: 0.01
+  iterations: 20
+  random_state: 42
+
+# Data Preprocessing
+preprocessing:
+  min_user_interactions: 5
+  min_movie_interactions: 5
+
+# Splitting
+splitting:
+  test_size: 0.2
+  stratify_by_user: True
+
+# Evaluation
+evaluation:
+  k: 10
+
+# Paths
+paths:
+  raw_data_dir: "Recommender/data/raw/"
+  processed_data_dir: "Recommender/data/processed/"
+  model_dir: "Recommender/models/"
+  ratings_file: "ratings.csv"
+  movies_file: "movies.csv"
+
+# Model
+model:
+  name: "baseline_als_v1.pkl" 

@@ -1,0 +1,10 @@
+pandas
+numpy
+scipy
+implicit[gpu]
+scikit-learn
+pyyaml
+tqdm
+psutil
+wandb
+cupy-cuda12x
