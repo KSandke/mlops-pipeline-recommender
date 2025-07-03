@@ -8,3 +8,8 @@ tqdm
 psutil
 wandb
 cupy-cuda12x
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-multipart
