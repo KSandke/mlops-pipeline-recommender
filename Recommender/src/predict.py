@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import joblib
 import os
 
@@ -19,7 +18,7 @@ class MovieRecommender:
         # Load movie metadata for readable recommendations
         self.movies_df = pd.read_csv("Recommender/data/raw/movies.csv")
         
-        print(f"Model loaded successfully!")
+        print("Model loaded successfully!")
         print(f"- Users in training: {len(self.user_map)}")
         print(f"- Movies in training: {len(self.movie_map)}")
 

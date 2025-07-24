@@ -3,12 +3,11 @@ Dependency injection for the API.
 Provides reusable dependencies for endpoints.
 """
 
-from fastapi import Depends, HTTPException, Header
+from fastapi import HTTPException, Header
 from typing import Optional
 
 from ..models.registry import get_model_registry
 from ..core.interfaces import BaseRecommendationModel
-from ..core.exceptions import ModelNotFoundError
 from .config import get_settings
 
 settings = get_settings()

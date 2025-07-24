@@ -1,7 +1,7 @@
 import pandas as pd
-import numpy as np
+import os
 
-def analyze_validation_set():
+def analyze_validation_data():
     """
     Analyze the validation set to understand why users are being filtered out.
     """
@@ -41,4 +41,4 @@ def analyze_validation_set():
     return val_df
 
 if __name__ == '__main__':
-    analyze_validation_set() 
+    analyze_validation_data() 

@@ -26,7 +26,7 @@ class RecommenderEvaluator:
             config = yaml.safe_load(f)
         self.eval_k = config.get('evaluation', {}).get('k', 10)
         
-        print(f"Evaluator loaded successfully!")
+        print("Evaluator loaded successfully!")
         print(f"- Validation set size: {len(self.validation_df)}")
         print(f"- Evaluation k: {self.eval_k}")
 

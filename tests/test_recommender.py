@@ -1,9 +1,7 @@
 import pytest
 import pandas as pd
-import numpy as np
-from unittest.mock import Mock, patch
-import os
 import sys
+import os
 
 # Add src to path for testing
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'Recommender', 'src'))

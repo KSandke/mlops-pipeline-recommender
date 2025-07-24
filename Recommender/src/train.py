@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import scipy.sparse as sparse
 import implicit
 import os
@@ -29,7 +28,6 @@ def train_model(config_path="Recommender/configs/model_config.yaml"):
     # Check CUDA availability and configuration
     use_gpu = cuda_config['enabled']
     try:
-        import cupy
         gpu_available = True
         print(f"CUDA is available. GPU usage: {'Enabled' if use_gpu else 'Disabled (by config)'}")
     except ImportError:

@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
 import os
 
 def preprocess_data(raw_data_path="Recommender/data/raw", processed_data_path="Recommender/data/processed"):

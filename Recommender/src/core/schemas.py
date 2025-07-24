@@ -3,10 +3,13 @@ Pydantic schemas for API request/response validation.
 These provide automatic validation, serialization, and OpenAPI documentation.
 """
 
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional, Dict, Any, Union
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
+from ..api.config import get_settings
+
+settings = get_settings()
 
 
 class ModelType(str, Enum):

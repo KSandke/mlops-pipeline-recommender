@@ -3,10 +3,10 @@ Model management endpoints for the API.
 Provides model information and management capabilities.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict
 
-from ...core.schemas import ModelInfo, ModelType
+from ...core.schemas import ModelInfo, HealthStatus
 from ...models.registry import get_model_registry
 from ...core.exceptions import ModelNotFoundError
 

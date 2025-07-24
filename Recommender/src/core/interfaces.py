@@ -4,7 +4,7 @@ These abstract base classes define contracts that all models must implement.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, Tuple
+from typing import List, Dict, Any, Optional
 from datetime import datetime
 from dataclasses import dataclass
 import numpy as np

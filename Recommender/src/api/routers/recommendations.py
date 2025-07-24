@@ -3,8 +3,7 @@ Recommendation endpoints for the API.
 Handles user recommendations, similar items, and batch predictions.
 """
 
-from fastapi import APIRouter, Depends, Query, Request
-from typing import Optional
+from fastapi import APIRouter, Depends, Request
 import time
 from datetime import datetime
 
@@ -16,9 +15,7 @@ from ...core.schemas import (
     SimilarItemsRequest,
     RecommendationItem,
     ItemInfo,
-    FilterCriteria
 )
-from ...models.registry import get_model_registry
 from ..dependencies import get_current_model
 
 router = APIRouter()

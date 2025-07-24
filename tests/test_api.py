@@ -1,4 +1,4 @@
-import pytest
+import pytest  # noqa: F401
 from fastapi.testclient import TestClient
 import sys
 import os
