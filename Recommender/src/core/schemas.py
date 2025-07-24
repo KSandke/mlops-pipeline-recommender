@@ -98,6 +98,9 @@ class RecommendationResponse(BaseModel):
     processing_time_ms: float
     
     class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
         json_schema_extra = {
             "example": {
                 "user_id": 123,
@@ -131,6 +134,32 @@ class BatchRecommendationResponse(BaseModel):
     successful_users: int
     failed_users: List[int]
     processing_time_ms: float
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+        json_schema_extra = {
+            "example": {
+                "user_id": 123,
+                "recommendations": [
+                    {
+                        "rank": 1,
+                        "score": 0.95,
+                        "item": {
+                            "item_id": 1,
+                            "title": "Toy Story",
+                            "genres": ["Animation", "Comedy"],
+                            "year": 1995
+                        }
+                    }
+                ],
+                "model_id": "als_prod_v1",
+                "model_version": "1.0.0",
+                "generated_at": "2025-07-03T12:00:00Z",
+                "processing_time_ms": 45.2
+            }
+        }
 
 
 class ModelInfo(BaseModel):

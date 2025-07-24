@@ -22,7 +22,7 @@ jobs:
         pip install -r Recommender/requirements-dev.txt
     - name: Lint with ruff
       run: |
-        ruff --output-format=github .
+        ruff check --output-format github .
     - name: Test with pytest
       run: |
         pytest
