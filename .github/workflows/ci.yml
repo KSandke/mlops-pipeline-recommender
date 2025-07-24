@@ -34,8 +34,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set repo name to lowercase
-      id: string
+    - name: Lowercase repository owner
+      id: owner_string
+      uses: ASzc/change-string-case-action@v5
+      with:
+        string: ${{ github.repository_owner }}
+
+    - name: Lowercase repository name
+      id: repo_string
       uses: ASzc/change-string-case-action@v5
       with:
         string: ${{ github.event.repository.name }}
@@ -52,4 +58,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/${{ steps.string.outputs.lowercase }}:latest 
+        tags: ghcr.io/${{ steps.owner_string.outputs.lowercase }}/${{ steps.repo_string.outputs.lowercase }}:latest 
