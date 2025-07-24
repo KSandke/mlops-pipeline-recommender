@@ -1,5 +1,6 @@
 import pytest
 import pandas as pd
+from scipy.sparse import csr_matrix
 import sys
 import os
 
@@ -92,7 +93,6 @@ class TestRecommendationSystem:
     def sample_interaction_matrix(self):
         """Create a sample interaction matrix for testing."""
         # Simple 3x3 matrix for testing
-        from scipy.sparse import csr_matrix
         data = [4.0, 3.5, 5.0, 2.0, 4.5]
         row = [0, 0, 1, 1, 2]
         col = [0, 1, 0, 2, 1]

@@ -194,13 +194,13 @@ class RecommenderEvaluator:
         Returns:
             Dictionary with evaluation results and saves to file
         """
-        print("=== RECOMMENDATION SYSTEM EVALUATION ===\n")
+        print("\n=== RECOMMENDATION SYSTEM EVALUATION ===\n")
         
         # Run evaluation
         metrics = self.evaluate_all_users(k_values=k_values, sample_size=sample_size)
         
         # Print results
-        print("BASELINE PERFORMANCE METRICS:")
+        print("\nBASELINE PERFORMANCE METRICS:")
         print("-" * 40)
         for k in k_values:
             print(f"Precision@{k}: {metrics[f'precision@{k}']:.4f} (±{metrics[f'precision@{k}_std']:.4f})")
@@ -214,7 +214,7 @@ class RecommenderEvaluator:
         results_file = "Recommender/models/evaluation_results.txt"
         with open(results_file, 'w') as f:
             f.write("=== RECOMMENDATION SYSTEM BASELINE EVALUATION ===\n\n")
-            f.write(f"Model: ALS Collaborative Filtering\n")
+            f.write("Model: ALS Collaborative Filtering\n")
             f.write(f"Evaluation Date: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"Users Evaluated: {metrics['evaluated_users']}/{metrics['total_validation_users']}\n\n")
             f.write("PERFORMANCE METRICS:\n")

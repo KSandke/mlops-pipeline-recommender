@@ -3,10 +3,10 @@ Model management endpoints for the API.
 Provides model information and management capabilities.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List, Dict
+from fastapi import APIRouter, HTTPException
+from typing import List
 
-from ...core.schemas import ModelInfo, HealthStatus
+from ...core.schemas import ModelInfo
 from ...models.registry import get_model_registry
 from ...core.exceptions import ModelNotFoundError
 
@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[ModelInfo])
-async def list_models():
+async def list_available_models():
     """
     List all available models.
     
@@ -22,27 +22,11 @@ async def list_models():
     status, version, and performance metrics.
     """
     registry = get_model_registry()
-    model_info_dict = registry.get_model_info()
-    
-    models = []
-    for model_id, info in model_info_dict.items():
-        if 'error' not in info:
-            models.append(ModelInfo(
-                model_id=info['model_id'],
-                model_type=ModelType(info['model_type'].lower()),
-                version=info['version'],
-                status="active" if info['is_loaded'] else "not_loaded",
-                trained_at=info['trained_at'],
-                metrics=info['metrics'],
-                hyperparameters={},  # Not exposing full hyperparameters
-                is_default=info['is_default']
-            ))
-    
-    return models
+    return list(registry.get_model_info().values())
 
 
 @router.get("/{model_id}", response_model=ModelInfo)
-async def get_model_info(model_id: str):
+async def get_model_details(model_id: str):
     """
     Get detailed information about a specific model.
     
@@ -60,7 +44,7 @@ async def get_model_info(model_id: str):
         
         return ModelInfo(
             model_id=model_id,
-            model_type=ModelType(metadata.model_type.lower()),
+            model_type=metadata.model_type,
             version=metadata.version,
             status="active" if model._is_loaded else "not_loaded",
             trained_at=metadata.trained_at,
@@ -68,8 +52,8 @@ async def get_model_info(model_id: str):
             hyperparameters=metadata.hyperparameters,
             is_default=model_id == registry._default_model_id
         )
-    except ModelNotFoundError:
-        raise HTTPException(status_code=404, detail=f"Model '{model_id}' not found")
+    except ModelNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.post("/{model_id}/set-default")
