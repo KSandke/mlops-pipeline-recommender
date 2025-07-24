@@ -142,7 +142,7 @@ async def recommender_exception_handler(request: Request, exc: RecommenderExcept
     
     return JSONResponse(
         status_code=status_code,
-        content=error_response.dict()
+        content=error_response.model_dump(mode="json")
     )
 
 
@@ -160,7 +160,7 @@ async def general_exception_handler(request: Request, exc: Exception):
     
     return JSONResponse(
         status_code=500,
-        content=error_response.dict()
+        content=error_response.model_dump(mode="json")
     )
 
 
