@@ -35,15 +35,16 @@ def analyze_validation_data(
     
     # Rating distribution by percentage
     rating_dist = validation_df['rating'].value_counts(normalize=True).sort_index()
-    print(f"\nRating distribution (percentages):")
+    print("\nRating distribution (percentages):")
     for rating, pct in rating_dist.items():
         print(f"Rating {rating}: {pct*100:.1f}%")
     
     # Check if each user has exactly one validation entry
     user_counts = validation_df['userId'].value_counts()
-    print(f"\nEntries per user in validation set:")
+    print("\nEntries per user in validation set:")
     print(f"Users with 1 entry: {(user_counts == 1).sum()}")
-    print(f"Users with >1 entry: {(user_counts > 1).sum()}")
+    if (user_counts > 1).any():
+        print(f"Users with >1 entry: {(user_counts > 1).sum()}")
     
     if (user_counts > 1).sum() > 0:
         print(f"Max entries per user: {user_counts.max()}")

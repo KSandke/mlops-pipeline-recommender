@@ -110,12 +110,12 @@ class TestRecommendationSystem:
 def test_imports():
     """Test that all required packages can be imported."""
     try:
-        import pandas
-        import numpy
-        import scipy
-        import implicit
-        import yaml
-        import joblib
+        import pandas  # noqa: F401
+        import numpy  # noqa: F401
+        import scipy  # noqa: F401
+        import implicit  # noqa: F401
+        import yaml  # noqa: F401
+        import joblib  # noqa: F401
     except ImportError as e:
         pytest.fail(f"Failed to import required package: {e}")
 
