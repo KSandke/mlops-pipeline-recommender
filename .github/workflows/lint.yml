@@ -21,7 +21,7 @@ jobs:
         pip install -r Recommender/requirements-dev.txt
     - name: Lint with ruff
       run: |
-        ruff --output-format=github .
+        ruff check--output-format=github .
   test:
     runs-on: ubuntu-latest
     steps:
