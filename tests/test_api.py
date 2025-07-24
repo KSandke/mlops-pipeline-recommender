@@ -1,6 +1,5 @@
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import MagicMock
 import sys
 import os
 from datetime import datetime
