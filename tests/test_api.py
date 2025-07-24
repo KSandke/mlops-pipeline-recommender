@@ -30,13 +30,13 @@ class MockRecommendationModel(BaseRecommendationModel):
     def predict_for_user(self, user_id, n_recommendations, **kwargs):
         results = []
         for i in range(n_recommendations):
-            results.append(RecommendationResult(item_id=i, score=1.0 - (i * 0.1), rank=i + 1))
+            results.append(RecommendationResult(item_id=i, score=1.0 - (i * 0.1), rank=i + 1, metadata={}))
         return results
 
     def predict_similar_items(self, item_id, n_similar, **kwargs):
         results = []
         for i in range(n_similar):
-            results.append(RecommendationResult(item_id=i + 10, score=1.0 - (i * 0.1), rank=i + 1))
+            results.append(RecommendationResult(item_id=i + 10, score=1.0 - (i * 0.1), rank=i + 1, metadata={'item_id': i + 10}))
         return results
 
     def predict_batch(self, user_ids, n_recommendations, **kwargs):
