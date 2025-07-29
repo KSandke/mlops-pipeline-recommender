@@ -16,6 +16,7 @@ from ...core.schemas import (
     RecommendationItem,
     ItemInfo,
 )
+from ...core.exceptions import UserNotFoundError
 from ..dependencies import get_current_model
 
 router = APIRouter()
@@ -31,17 +32,27 @@ async def get_user_recommendations(
     Get personalized recommendations for a user.
     
     This endpoint generates movie recommendations based on the user's historical ratings
-    and preferences using collaborative filtering.
+    and preferences using collaborative filtering. If the user is new, it returns
+    a list of popular items as a fallback.
     """
     start_time = time.time()
+    is_new_user = False
     
-    # Get recommendations from model
-    recommendations = model.predict_for_user(
-        user_id=request.user_id,
-        n_recommendations=request.n_recommendations,
-        exclude_items=request.exclude_items,
-        filter_criteria=request.filter_criteria.dict() if request.filter_criteria else None
-    )
+    try:
+        # Get recommendations from model for existing user
+        recommendations = model.predict_for_user(
+            user_id=request.user_id,
+            n_recommendations=request.n_recommendations,
+            exclude_items=request.exclude_items,
+            filter_criteria=request.filter_criteria.dict() if request.filter_criteria else None
+        )
+    except UserNotFoundError:
+        # Handle new users with a "cold start" strategy (e.g., popular items)
+        is_new_user = True
+        recommendations = model.get_popular_items(
+            n_recommendations=request.n_recommendations,
+            filter_criteria=request.filter_criteria.dict() if request.filter_criteria else None
+        )
     
     # Convert to response format
     recommendation_items = []
@@ -67,6 +78,7 @@ async def get_user_recommendations(
     return RecommendationResponse(
         user_id=request.user_id,
         recommendations=recommendation_items,
+        is_new_user=is_new_user,
         model_id=model.model_id,
         model_version=model.get_model_metadata().version,
         generated_at=datetime.utcnow(),

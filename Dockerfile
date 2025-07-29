@@ -34,4 +34,4 @@ ENV WANDB_MODE=offline
 EXPOSE 8000
 
 # Default command
-CMD ["python", "Recommender/src/predict.py"] 
+CMD ["uvicorn", "Recommender.src.api.main:app", "--host", "0.0.0.0", "--port", "8000"] 

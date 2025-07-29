@@ -92,9 +92,10 @@ class RecommendationItem(BaseModel):
 
 
 class RecommendationResponse(BaseModel):
-    """Response model for recommendations."""
+    """Response model for user recommendations."""
     user_id: int
     recommendations: List[RecommendationItem]
+    is_new_user: bool = False
     model_id: str
     model_version: str
     generated_at: datetime

@@ -146,7 +146,48 @@ class ALSRecommendationModel(BaseRecommendationModel):
         except Exception as e:
             logger.error(f"Prediction failed for user {user_id}: {str(e)}")
             raise PredictionError(self.model_id, str(e))
-    
+            
+    def get_popular_items(
+        self,
+        n_recommendations: int = 10,
+        filter_criteria: Optional[Dict[str, Any]] = None
+    ) -> List[RecommendationResult]:
+        """
+        Get most popular items for new users (cold start).
+        """
+        if not self._is_loaded:
+            raise ModelNotLoadedError(self.model_id)
+
+        # Start with the full ratings statistics
+        popular_items = self.ratings_stats.copy()
+
+        # Simple popularity metric: high average rating with a reasonable number of ratings
+        min_ratings = 50  # Must have at least 50 ratings
+        popular_items = popular_items[popular_items['total_ratings'] >= min_ratings]
+
+        # Sort by average rating
+        popular_items = popular_items.sort_values(by='avg_rating', ascending=False)
+        
+        # Apply filters if any
+        results = []
+        for _, row in popular_items.iterrows():
+            movie_id = int(row['movieId'])
+            
+            if filter_criteria and not self._passes_filter(movie_id, filter_criteria):
+                continue
+            
+            results.append(RecommendationResult(
+                item_id=movie_id,
+                score=row['avg_rating'],
+                rank=len(results) + 1,
+                metadata=self._get_movie_metadata(movie_id)
+            ))
+            
+            if len(results) >= n_recommendations:
+                break
+        
+        return results
+
     def predict_similar_items(
         self,
         item_id: int,
