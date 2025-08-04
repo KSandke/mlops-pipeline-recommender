@@ -13,3 +13,7 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 python-multipart
+mlflow
+torch
+torchvision
+torchaudio

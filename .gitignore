@@ -172,10 +172,28 @@ Recommender/data/processed/*
 Recommender/models/*
 !Recommender/models/.gitkeep
 
+# Neural network specific
+Recommender/data/processed/neural/
+*.joblib
+
 # Logs
 *.log
 logs/
 training_log.txt
+
+# Optuna
+optuna_study.db
+*.db
+
+# PyTorch
+*.pth
+*.pt
+torch_models/
+
+# Large datasets
+*.zip
+*.tar.gz
+*.rar
 
 # IDE
 .vscode/

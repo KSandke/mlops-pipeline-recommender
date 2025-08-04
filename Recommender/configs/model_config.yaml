@@ -2,17 +2,18 @@
 processed_data_path: "Recommender/data/processed"
 model_path: "Recommender/models"
 
-# Weights & Biases Configuration
-wandb:
-  project: "movielens-recommender"
-  entity: ksandke-university-of-colorado-boulder
-  enabled: true
-  tags: ["als", "collaborative-filtering", "movielens"]
+# MLflow Configuration
+mlflow:
+  experiment_name: "movielens_als_tuning"
+
+# Optuna Configuration
+optuna:
+  n_trials: 5  # Reduced from 10
 
 # CUDA Configuration
 cuda:
-  enabled: false  # Temporarily disabled while troubleshooting GPU setup
-  device: 0      # GPU device index
+  enabled: true  # Temporarily disabled while troubleshooting GPU setup
+  device: 1      # GPU device index
 
 # ALS Model Hyperparameters
 als:
@@ -45,4 +46,13 @@ paths:
 
 # Model
 model:
-  name: "baseline_als_v1.pkl" 
+  name: "baseline_als_v1.pkl"
+
+# Neural Network Configuration
+neural:
+  epochs: 10  # Conservative reduction from 30
+  embedding_dim: 64
+  layers: [128, 64, 32]
+  dropout: 0.1
+  learning_rate: 0.001
+  batch_size: 3072  # Conservative increase from 2048 

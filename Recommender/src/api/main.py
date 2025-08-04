@@ -20,6 +20,7 @@ from ..core.exceptions import RecommenderException
 from ..core.schemas import ErrorResponse
 from ..models.registry import get_model_registry
 from ..models.als_model import ALSRecommendationModel
+from ..models.neural_model import NeuralRecommendationModel
 
 # Configure logging
 logging.basicConfig(
@@ -53,6 +54,19 @@ async def lifespan(app: FastAPI):
             trained_at="2025-07-01T10:00:00"
         )
         registry.register_model(als_model)
+        
+        # Load Neural model (if available)
+        try:
+            neural_model = NeuralRecommendationModel(model_id="neural_prod_v1")
+            neural_model.load(
+                model_path=settings.MODEL_PATH,
+                version="1.0.0",
+                trained_at="2025-07-01T10:00:00"
+            )
+            registry.register_model(neural_model)
+            logger.info("Neural model loaded successfully")
+        except Exception as e:
+            logger.warning(f"Neural model not available: {str(e)}")
         
         logger.info(f"Loaded {len(registry.list_models())} models")
         

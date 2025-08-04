@@ -93,4 +93,32 @@ async def model_health_check(model_id: str):
         model = registry.get_model(model_id)
         return model.health_check()
     except ModelNotFoundError:
-        raise HTTPException(status_code=404, detail=f"Model '{model_id}' not found") 
+        raise HTTPException(status_code=404, detail=f"Model '{model_id}' not found")
+
+
+@router.get("/default", response_model=ModelInfo)
+async def get_default_model():
+    """
+    Get information about the current default model.
+    
+    Returns:
+        Information about the default model
+    """
+    registry = get_model_registry()
+    
+    try:
+        default_model = registry.get_default_model()
+        metadata = default_model.get_model_metadata()
+        
+        return ModelInfo(
+            model_id=default_model.model_id,
+            model_type=metadata.model_type,
+            version=metadata.version,
+            status="active" if default_model._is_loaded else "not_loaded",
+            trained_at=metadata.trained_at,
+            metrics=metadata.metrics,
+            hyperparameters=metadata.hyperparameters,
+            is_default=True
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting default model: {str(e)}") 

@@ -3,9 +3,10 @@ Recommendation endpoints for the API.
 Handles user recommendations, similar items, and batch predictions.
 """
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, Query
 import time
 from datetime import datetime
+from typing import Optional
 
 from ...core.schemas import (
     RecommendationRequest,
@@ -26,7 +27,8 @@ router = APIRouter()
 async def get_user_recommendations(
     request: RecommendationRequest,
     req: Request,
-    model=Depends(get_current_model)
+    model=Depends(get_current_model),
+    model_id: Optional[str] = Query(None, description="Specific model ID to use (optional)")
 ):
     """
     Get personalized recommendations for a user.
@@ -37,6 +39,23 @@ async def get_user_recommendations(
     """
     start_time = time.time()
     is_new_user = False
+    
+    # Use specific model if requested
+    if model_id:
+        from ...models.registry import get_model_registry
+        registry = get_model_registry()
+        try:
+            model = registry.get_model(model_id)
+        except Exception as e:
+            return RecommendationResponse(
+                user_id=request.user_id,
+                recommendations=[],
+                error=f"Model '{model_id}' not found: {str(e)}",
+                model_id=model_id,
+                model_version="unknown",
+                generated_at=datetime.utcnow(),
+                processing_time_ms=0
+            )
     
     try:
         # Get recommendations from model for existing user
