@@ -1,252 +1,200 @@
-# MovieLens Recommendation System - MLOps Project
+# MovieLens Recommendation System (MLOps)
 
-A production-ready movie recommendation system built with collaborative filtering, featuring comprehensive MLOps practices including experiment tracking, model evaluation, and reproducible pipelines.
+A production-oriented movie recommendation system using collaborative filtering (ALS) with an optional neural model (Neural Collaborative Filtering). The project includes a FastAPI service for online inference, a Gradio demo UI, reproducible training and evaluation pipelines, and CI/CD with Docker and GitHub Actions.
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![MLOps](https://img.shields.io/badge/MLOps-Enabled-green.svg)
-![Weights & Biases](https://img.shields.io/badge/Weights%20&%20Biases-Tracking-orange.svg)
+Important: AWS deployment integration (ECS) is scaffolded but incomplete. Placeholders exist in the workflow and require environment-specific values and infrastructure.
 
-## 🎯 Project Overview
+## Overview
 
-This project implements a collaborative filtering recommendation system using the MovieLens dataset with modern MLOps practices. The system can recommend movies to users based on their historical ratings and find similar movies using matrix factorization techniques.
+This system trains on the MovieLens dataset to provide personalized recommendations and item-to-item similarity. It exposes:
 
-### Key Features
+- A FastAPI service with endpoints for user recommendations, similar items, batch prediction, health, and model management
+- Offline training and hyperparameter tuning (ALS via implicit; Optuna), tracked with MLflow
+- Evaluation utilities that compute Precision@K, Recall@K, and MAP@K on a time-based validation split
+- A Gradio demo for manual exploration
 
-- **Collaborative Filtering**: ALS (Alternating Least Squares) matrix factorization
-- **Experiment Tracking**: Weights & Biases integration
-- **Model Evaluation**: Comprehensive metrics (Precision@K, Recall@K, MAP@K)
-- **GPU Acceleration**: CUDA support for faster training
-- **Reproducible Pipelines**: Configuration-driven training and evaluation
-- **Production Ready**: Modular code structure with proper error handling
+## Key Features
 
-## 📊 Performance Metrics (Baseline)
+- Recommendation models: ALS baseline; optional Neural Collaborative Filtering
+- API: Production-style FastAPI app with CORS, trusted hosts, structured error handling, and request metadata
+- Model registry: Thread-safe model registry to manage multiple models and set a default serving model
+- Training: Configuration-driven ALS training with Optuna sweeps and MLflow tracking
+- Neural pipeline: Data preprocessing and training utilities for the neural model
+- Evaluation: Precision@K, Recall@K, MAP@K on held-out, time-based validation
+- MLOps tooling: Dockerfile, Makefile targets, unit tests, GitHub Actions CI
+- Demo: Gradio interface for recommendations
 
-| Metric | Value |
-|--------|-------|
-| Precision@10 | 0.0144 (1.44%) |
-| Recall@10 | 0.1436 (14.36%) |
-| MAP@10 | 0.0499 |
-
-*Evaluated on 564 users with ratings ≥4.0 from time-based validation split*
-
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 MLOps/
 ├── Recommender/
 │   ├── configs/
-│   │   └── model_config.yaml          # Model hyperparameters and paths
+│   │   └── model_config.yaml            # Paths, ALS/neural config, CUDA, Optuna, evaluation
 │   ├── data/
-│   │   ├── raw/                       # Original MovieLens data
-│   │   ├── processed/                 # Preprocessed train/validation sets
-│   │   └── splits/                    # Data splitting artifacts
-│   ├── models/                        # Trained model artifacts
-│   ├── notebooks/                     # Jupyter notebooks for exploration
-│   ├── src/
-│   │   ├── data_loader.py            # Data loading utilities
-│   │   ├── explore_data.py           # Data exploration script
-│   │   ├── preprocess_data.py        # Data preprocessing pipeline
-│   │   ├── train.py                  # Model training script
-│   │   ├── predict.py                # Inference and recommendation script
-│   │   ├── evaluator.py              # Model evaluation metrics
-│   │   └── analyze_validation.py     # Validation set analysis
-│   └── requirements.txt              # Python dependencies
-├── .gitignore                        # Git ignore rules for ML projects
-└── README.md                         # This file
+│   │   ├── raw/                         # MovieLens CSVs (ratings.csv, movies.csv, ...)
+│   │   └── processed/                   # Preprocessed train/validation, neural artifacts
+│   ├── models/                          # Trained model artifacts (ALS, neural)
+│   └── src/
+│       ├── api/
+│       │   ├── main.py                  # FastAPI app, middleware, router registration
+│       │   ├── config.py                # Pydantic settings (env-driven)
+│       │   ├── dependencies.py          # DI for model selection, API key checks
+│       │   └── routers/                 # /recommendations, /health, /models
+│       ├── core/
+│       │   ├── interfaces.py            # BaseRecommendationModel, registry interfaces
+│       │   ├── schemas.py               # Pydantic request/response models
+│       │   └── exceptions.py            # Domain exceptions
+│       ├── models/
+│       │   ├── als_model.py             # ALS model adapted to standard interface
+│       │   ├── neural_model.py          # Neural CF model adapted to interface
+│       │   └── registry.py              # Thread-safe model registry
+│       ├── explore_data.py              # Raw data exploration helper
+│       ├── preprocess_data.py           # Data preprocessing and time-based split
+│       ├── train.py                     # ALS training + Optuna + MLflow
+│       ├── evaluator.py                 # Evaluation metrics and reporting
+│       ├── analyze_validation.py        # Validation set analysis helper
+│       ├── predict.py                   # ALS-based local recommendation helper
+│       ├── train_neural.py              # Neural model training with MLflow/Optuna
+│       └── predict_neural.py            # Neural-based local recommendation helper
+├── app.py                               # Gradio demo (local UI)
+├── Dockerfile                           # Image for serving API
+├── Makefile                             # Common tasks (preprocess/train/evaluate/serve)
+├── requirements.txt                     # Runtime/training dependencies
+├── requirements-dev.txt                 # Dev tooling (pytest, ruff, etc.)
+├── .github/workflows/ci.yml             # CI/CD pipeline (AWS deploy step incomplete)
+└── README.md
 ```
 
-## 🚀 Quick Start
+## Setup
 
-### Prerequisites
+Prerequisites:
 
-- Python 3.8+
-- CUDA Toolkit 12.x (optional, for GPU acceleration)
+- Python 3.9+ (Docker image uses 3.9-slim)
 - Git
+- Optional: CUDA 12.x for GPU-accelerated ALS and neural training
 
-### Installation
+Create environment and install dependencies:
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd MLOps
-   ```
-
-2. **Set up virtual environment**
-   ```bash
-   python -m venv Recommender/.venv
-   
-   # Windows
-   .\Recommender\.venv\Scripts\Activate.ps1
-   
-   # Linux/Mac
-   source Recommender/.venv/bin/activate
-   ```
-
-3. **Install dependencies**
-   ```bash
-   pip install -r Recommender/requirements.txt
-   ```
-
-4. **Set up Weights & Biases** (optional)
-   ```bash
-   wandb login
-   ```
-
-### Data Setup
-
-1. Download the MovieLens Latest Dataset from [GroupLens](https://grouplens.org/datasets/movielens/)
-2. Extract CSV files to `Recommender/data/raw/`
-3. Required files:
-   - `ratings.csv`
-   - `movies.csv`
-   - `tags.csv`
-   - `links.csv`
-   - `genome-scores.csv`
-   - `genome-tags.csv`
-
-## 🔄 Usage
-
-### 1. Data Exploration
 ```bash
-python Recommender/src/explore_data.py
+python -m venv .venv_mlops
+. .venv_mlops/Scripts/activate  # Windows PowerShell: .venv_mlops\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-### 2. Data Preprocessing
+Data setup:
+
+1) Download MovieLens (ml-latest) from GroupLens and extract CSVs into `Recommender/data/raw/`
+2) Required files: `ratings.csv`, `movies.csv` (others optional for this pipeline)
+
+## Usage
+
+Preprocess and split data (time-based, per user):
+
 ```bash
 python Recommender/src/preprocess_data.py
 ```
 
-### 3. Model Training
+Train ALS with Optuna, track with MLflow:
+
 ```bash
 python Recommender/src/train.py
 ```
 
-### 4. Model Evaluation
+Evaluate on validation set (Precision@K, Recall@K, MAP@K):
+
 ```bash
 python Recommender/src/evaluator.py
 ```
 
-### 5. Generate Recommendations
+Serve the API locally:
+
 ```bash
-python Recommender/src/predict.py
+uvicorn Recommender.src.api.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-## ⚙️ Configuration
+Gradio demo UI:
 
-Edit `Recommender/configs/model_config.yaml` to customize:
-
-- **Model hyperparameters**: factors, regularization, iterations
-- **CUDA settings**: GPU acceleration on/off
-- **Weights & Biases**: project name, entity, tags
-- **File paths**: data and model directories
-
-```yaml
-# ALS Model Hyperparameters
-als:
-  factors: 50
-  regularization: 0.01
-  iterations: 20
-  random_state: 42
-
-# CUDA Configuration
-cuda:
-  enabled: true
-  device: 0
+```bash
+python app.py
 ```
 
-## 📈 Experiment Tracking
+Makefile shortcuts (optional):
 
-The project uses Weights & Biases for experiment tracking:
-
-- **Hyperparameters**: All model configuration logged
-- **Training Metrics**: Loss progression, dataset statistics
-- **Model Artifacts**: Trained models automatically saved
-- **System Metrics**: GPU usage, training time
-
-View your experiments at: https://wandb.ai/your-username/movielens-recommender
-
-## 🧪 Model Evaluation
-
-The evaluation system provides comprehensive metrics:
-
-- **Precision@K**: Fraction of recommended items that are relevant
-- **Recall@K**: Fraction of relevant items that are recommended  
-- **MAP@K**: Mean Average Precision (accounts for ranking quality)
-
-Evaluation uses time-based validation split where each user's most recent rating is held out for testing.
-
-## 🔧 API Usage
-
-### Generate User Recommendations
-```python
-from Recommender.src.predict import MovieRecommender
-
-recommender = MovieRecommender()
-recommendations = recommender.get_user_recommendations(
-    user_id=123, 
-    n_recommendations=10
-)
-print(recommendations)
+```bash
+make preprocess
+make train
+make evaluate
+make serve
 ```
 
-### Find Similar Movies
-```python
-similar_movies = recommender.get_similar_movies(
-    movie_id=1, 
-    n_similar=5
-)
-print(similar_movies)
+## Configuration
+
+The file `Recommender/configs/model_config.yaml` controls paths and parameters. Highlights:
+
+- Paths: `processed_data_path`, `model_path`
+- MLflow: `mlflow.experiment_name`
+- Optuna: `optuna.n_trials`
+- CUDA: `cuda.enabled`, `cuda.device`
+- ALS: `als.factors`, `als.regularization`, `als.iterations`, `als.random_state`
+- Evaluation: `evaluation.k`
+- Neural: `neural.epochs`, `neural.embedding_dim`, `neural.layers`, `neural.dropout`, `neural.learning_rate`, `neural.batch_size`
+
+## API
+
+Base URL: `/` (docs at `/docs`, OpenAPI JSON at `/openapi.json`)
+
+- POST `/api/v1/recommendations/user`
+  - Body: `{ "user_id": int, "n_recommendations": int, "filter_criteria": { ... } }`
+  - Returns ranked recommendations for a user. Cold-start falls back to popular items.
+
+- POST `/api/v1/recommendations/similar`
+  - Body: `{ "item_id": int, "n_similar": int }`
+  - Returns items similar to the provided item.
+
+- POST `/api/v1/recommendations/batch`
+  - Body: `{ "user_ids": [int, ...], "n_recommendations": int }`
+  - Returns recommendations for multiple users in one request.
+
+- GET `/api/v1/health`
+  - Health/readiness/liveness checks.
+
+- GET `/api/v1/models` and `/api/v1/models/{model_id}`
+  - List and inspect registered models; set default via `POST /api/v1/models/{model_id}/set-default`.
+
+Model selection:
+
+- Use a query param `model_id`, header `X-Model-ID`, or the registry default.
+
+## Docker
+
+Build and run the API:
+
+```bash
+docker build -t mlops-recsys .
+docker run --rm -p 8000:8000 mlops-recsys
 ```
 
-## 🚀 GPU Acceleration
+Mount local data/models if needed:
 
-For faster training with CUDA:
+```bash
+docker run --rm -p 8000:8000 \
+  -v %cd%\Recommender:/workspace/Recommender \
+  mlops-recsys
+```
 
-1. **Install CUDA-enabled dependencies**
-   ```bash
-   pip install cupy-cuda12x  # For CUDA 12.x
-   ```
+## CI/CD
 
-2. **Enable in configuration**
-   ```yaml
-   cuda:
-     enabled: true
-     device: 0
-   ```
+GitHub Actions workflow:
 
-Expected speedup: 5-10x faster training on compatible GPUs.
+- Lint (ruff) and test (pytest)
+- Build and publish Docker image to GHCR
+- AWS ECS deployment step is present but incomplete and contains placeholders. You must supply your task definition, container name, cluster, service, and AWS credentials/secrets and provision the required infrastructure before enabling deployment.
 
-## 📊 Dataset Information
+## Notes on Models and Artifacts
 
-- **Dataset**: MovieLens Latest (ml-latest)
-- **Ratings**: 33M+ ratings from 330K+ users
-- **Movies**: 86K+ movies with metadata
-- **Time Range**: 1995-2023
-- **Rating Scale**: 0.5-5.0 stars
+- ALS artifacts (model, maps, interaction matrix) are saved under `Recommender/models/`
+- The API loads models at startup via the registry; ensure artifacts exist before serving
+- Neural model support is optional and depends on `neural_*` artifacts being present
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [GroupLens Research](https://grouplens.org/) for the MovieLens dataset
-- [Implicit Library](https://github.com/benfred/implicit) for collaborative filtering algorithms
-- [Weights & Biases](https://wandb.ai/) for experiment tracking
-
-## 📚 References
-
-- Harper, F. M., & Konstan, J. A. (2015). The MovieLens Datasets: History and Context. ACM Transactions on Interactive Intelligent Systems, 5(4), 1-19.
-- Hu, Y., Koren, Y., & Volinsky, C. (2008). Collaborative Filtering for Implicit Feedback Datasets. IEEE International Conference on Data Mining.
-
----
-
-**Built with ❤️ for the MLOps community** 
